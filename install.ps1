@@ -1,4 +1,4 @@
-# Set URL sumber file
+# Set lokasi file dan URL
 $batUrl    = 'https://file.mocina.my.id/uploads/installer.bat'
 $batFile   = "$env:TEMP\installer.bat"
 
@@ -10,7 +10,7 @@ function Write-Info($msg)    { Write-Host "[INFO]  $msg" -ForegroundColor Cyan }
 function Write-Success($msg) { Write-Host "[ OK ]  $msg" -ForegroundColor Green }
 function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
 
-# Mulai download
+# Unduh installer.bat (selalu update)
 Write-Info "Mengunduh installer.bat..."
 try {
     Invoke-WebRequest -Uri $batUrl -OutFile $batFile -ErrorAction Stop
@@ -20,13 +20,18 @@ try {
     exit 1
 }
 
-Write-Info "Mengunduh aria2c.exe..."
-try {
-    Invoke-WebRequest -Uri $aria2Url -OutFile $aria2File -ErrorAction Stop
-    Write-Success "Berhasil mengunduh aria2c.exe"
-} catch {
-    Write-ErrorMsg "Gagal mengunduh aria2c.exe"
-    exit 1
+# Cek apakah aria2c.exe sudah ada
+if (Test-Path $aria2File) {
+    Write-Info "aria2c.exe sudah ada. Melewati proses download."
+} else {
+    Write-Info "Mengunduh aria2c.exe..."
+    try {
+        Invoke-WebRequest -Uri $aria2Url -OutFile $aria2File -ErrorAction Stop
+        Write-Success "Berhasil mengunduh aria2c.exe"
+    } catch {
+        Write-ErrorMsg "Gagal mengunduh aria2c.exe"
+        exit 1
+    }
 }
 
 # Jalankan installer.bat
