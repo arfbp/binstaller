@@ -2,10 +2,10 @@
 $batUrl    = 'https://file.mocina.my.id/uploads/installer.bat'
 $batFile   = "$env:TEMP\installer.bat"
 
-$aria2ZipUrl  = 'https://file.mocina.my.id/uploads/aria2c.zip'
+$aria2ZipUrl  = 'https://file.mocina.my.id/uploads/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
 $aria2Folder  = "$env:TEMP\aria2"
 $aria2Exe     = "$aria2Folder\aria2c.exe"
-$aria2ZipPath = "$env:TEMP\aria2c.zip"
+$aria2ZipPath = "$env:TEMP\aria2c.exe" #ganti dari .zip jadi .exe
 
 # Fungsi warna output
 function Write-Info($msg)    { Write-Host "[INFO]  $msg" -ForegroundColor Cyan }
@@ -27,27 +27,30 @@ if (Test-Path $aria2Exe) {
     Write-Info "aria2c.exe sudah tersedia di folder %TEMP%\aria2"
 } else {
     # Download ZIP
-    Write-Info "Mengunduh aria2c.zip..."
+    Write-Info "Mengunduh aria2c"
     try {
         Invoke-WebRequest -Uri $aria2ZipUrl -OutFile $aria2ZipPath -ErrorAction Stop
-        Write-Success "Berhasil mengunduh aria2c.zip"
+        Write-Success "Berhasil mengunduh aria2c"
     } catch {
         Write-ErrorMsg "Gagal mengunduh aria2c.zip"
         exit 1
     }
 
+
+# line ini gak perlu 
     # Ekstrak
-    Write-Info "Mengekstrak aria2c.zip ke folder: $aria2Folder"
-    try {
-        Expand-Archive -Path $aria2ZipPath -DestinationPath $aria2Folder -Force
-        Write-Success "Ekstraksi berhasil"
-    } catch {
-        Write-ErrorMsg "Gagal mengekstrak aria2c.zip"
-        exit 1
-    }
+ #   Write-Info "Mengekstrak aria2c.zip ke folder: $aria2Folder"
+ #   try {
+ #       Expand-Archive -Path $aria2ZipPath -DestinationPath $aria2Folder -Force
+ #       Write-Success "Ekstraksi berhasil"
+ #   } catch {
+ #       Write-ErrorMsg "Gagal mengekstrak aria2c.zip"
+ #       exit 1
+ #   }
 }
 
 # Jalankan installer.bat dengan PATH yang sudah include aria2
 Write-Info "Menjalankan installer..."
 $env:PATH = "$aria2Folder;$env:PATH"
 cmd /c $batFile
+
