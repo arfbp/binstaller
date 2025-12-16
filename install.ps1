@@ -1,8 +1,8 @@
 # Set lokasi dan URL
-$batUrl    = 'https://file.mocina.my.id/play/installer.bat'
+$batUrl    = 'https://file.mocina.my.id/upload/installer.bat'
 $batFile   = "$env:TEMP\installer.bat"
 
-$aria2ZipUrl  = 'https://file.mocina.my.id/play/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
+$aria2ZipUrl  = 'https://file.mocina.my.id/upload/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
 $aria2Folder  = "$env:TEMP\aria2"
 $aria2Exe     = "$aria2Folder\aria2c.exe"
 $aria2ZipPath = "$env:TEMP\aria2c.exe" #ganti dari .zip jadi .exe
@@ -53,6 +53,7 @@ if (Test-Path $aria2Exe) {
 Write-Info "Menjalankan installer..."
 $env:PATH = "$aria2Folder;$env:PATH"
 cmd /c $batFile
+
 
 
 
