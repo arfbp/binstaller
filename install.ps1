@@ -1,60 +1,79 @@
-# Set lokasi dan URL
-$batUrl    = 'https://file.mocina.my.id/uploads/installer.bat'
-$batFile   = "$env:TEMP\installer.bat"
+$ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityPointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-$aria2ZipUrl  = 'https://file.mocina.my.id/uploads/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
-$aria2Folder  = "$env:TEMP\aria2"
-$aria2Exe     = "$aria2Folder\aria2c.exe"
-$aria2ZipPath = "$env:TEMP\aria2c.exe" #ganti dari .zip jadi .exe
+$LogFile = Join-Path $env:TEMP "installer.log"
 
-# Fungsi warna output
-function Write-Info($msg)    { Write-Host "[INFO]  $msg" -ForegroundColor Cyan }
-function Write-Success($msg) { Write-Host "[ OK ]  $msg" -ForegroundColor Green }
-function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
-
-# Unduh installer.bat (selalu update)
-Write-Info "Mengunduh installer.bat..."
-try {
-    Invoke-WebRequest -Uri $batUrl -OutFile $batFile -ErrorAction Stop
-    Write-Success "Berhasil mengunduh installer.bat"
-} catch {
-    Write-ErrorMsg "Gagal mengunduh installer.bat"
-    exit 1
+function Write-Log($Level,$Message){
+    $ts=Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $line="[$ts] [$Level] $Message"
+    Add-Content -Path $LogFile -Value $line
+    switch($Level){
+        "INFO"{Write-Host $line -ForegroundColor Cyan}
+        "OK"{Write-Host $line -ForegroundColor Green}
+        "FAIL"{Write-Host $line -ForegroundColor Red}
+        default{Write-Host $line}
+    }
+}
+function Invoke-DownloadWithRetry{
+param([string]$Uri,[string]$OutFile,[int]$Retry=3)
+    Remove-Item $OutFile -Force -ErrorAction SilentlyContinue
+    for($i=1;$i -le $Retry;$i++){
+        try{
+            Write-Log INFO "Download ($i/$Retry): $Uri"
+            Invoke-WebRequest -Uri $Uri -OutFile $OutFile -UseBasicParsing -TimeoutSec 60
+            if(!(Test-Path $OutFile)){throw "File tidak ditemukan."}
+            if((Get-Item $OutFile).Length -le 0){throw "File kosong."}
+            Write-Log OK "Download selesai: $OutFile"
+            return
+        }catch{
+            Write-Log FAIL $_.Exception.Message
+            if($i -lt $Retry){Start-Sleep 2}else{throw}
+        }
+    }
 }
 
-# Cek apakah aria2c.exe sudah ada
-if (Test-Path $aria2Exe) {
-    Write-Info "aria2c.exe sudah tersedia di folder %TEMP%\aria2"
-} else {
-    # Download ZIP
-    Write-Info "Mengunduh aria2c"
-    try {
-        Invoke-WebRequest -Uri $aria2ZipUrl -OutFile $aria2ZipPath -ErrorAction Stop
-        Write-Success "Berhasil mengunduh aria2c"
-    } catch {
-        Write-ErrorMsg "Gagal mengunduh aria2c.zip"
-        exit 1
+$batUrl='https://file.mocina.my.id/uploads/installer.bat'
+$batFile="$env:TEMP\installer.bat"
+$aria2ZipUrl='https://file.mocina.my.id/uploads/aria2c.exe'
+$aria2Folder="$env:TEMP\aria2"
+$aria2Exe="$aria2Folder\aria2c.exe"
+$aria2ZipPath="$env:TEMP\aria2c.exe"
+
+try{
+    Write-Log INFO "Memulai installer"
+
+    Invoke-DownloadWithRetry -Uri $batUrl -OutFile $batFile
+
+    if(!(Test-Path $aria2Exe) -or ((Get-Item $aria2Exe).Length -le 0)){
+        if(!(Test-Path $aria2Folder)){
+            New-Item -ItemType Directory -Path $aria2Folder -Force|Out-Null
+        }
+        Invoke-DownloadWithRetry -Uri $aria2ZipUrl -OutFile $aria2ZipPath
+        Move-Item $aria2ZipPath $aria2Exe -Force -ErrorAction Stop
+        Write-Log OK "aria2 siap"
+    }else{
+        Write-Log INFO "aria2 sudah tersedia"
     }
 
-
-# line ini gak perlu 
-    # Ekstrak
- #   Write-Info "Mengekstrak aria2c.zip ke folder: $aria2Folder"
- #   try {
- #       Expand-Archive -Path $aria2ZipPath -DestinationPath $aria2Folder -Force
- #       Write-Success "Ekstraksi berhasil"
- #   } catch {
- #       Write-ErrorMsg "Gagal mengekstrak aria2c.zip"
- #       exit 1
- #   }
+    $env:PATH="$aria2Folder;$env:PATH"
+    Write-Log INFO "Menjalankan installer.bat"
+    & cmd.exe /c "`"$batFile`""
+    $ec=$LASTEXITCODE
+    Write-Log INFO "ExitCode: $ec"
+    if($ec -ne 0){throw "installer.bat exit code $ec"}
+    Write-Log OK "Selesai"
 }
-
-# Jalankan installer.bat dengan PATH yang sudah include aria2
-Write-Info "Menjalankan installer..."
-$env:PATH = "$aria2Folder;$env:PATH"
-cmd /c $batFile
-
-
-
-
-
+catch{
+    Write-Log FAIL $_.Exception.Message
+    if($_.InvocationInfo){
+        Write-Host ""
+        Write-Host $_.InvocationInfo.PositionMessage -ForegroundColor Yellow
+    }
+    if($_.ScriptStackTrace){
+        Write-Host ""
+        Write-Host $_.ScriptStackTrace -ForegroundColor DarkYellow
+    }
+}
+finally{
+    Read-Host "Tekan ENTER untuk keluar"
+}
