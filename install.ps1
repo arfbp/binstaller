@@ -1,5 +1,5 @@
 # Set lokasi dan URL
-$batUrl    = 'https://file.mocina.my.id/uploads/installer.bat'
+$batUrl    = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/installer.bat'
 $batFile   = "$env:TEMP\installer.bat"
 
 $aria2ZipUrl  = 'https://file.mocina.my.id/uploads/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
