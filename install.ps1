@@ -2,7 +2,7 @@
 $batUrl    = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/installer.bat'
 $batFile   = "$env:TEMP\installer.bat"
 
-$aria2ZipUrl  = 'https://file.mocina.my.id/uploads/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
+$aria2ZipUrl  = 'https://github.com/arfbp/binstaller/raw/refs/heads/main/aria2c.exe' #ini diganti ya ges, gapake yg zip lagi  tp variable nya sama
 $aria2Folder  = "$env:TEMP\aria2"
 $aria2Exe     = "$aria2Folder\aria2c.exe"
 $aria2ZipPath = "$env:TEMP\aria2c.exe" #ganti dari .zip jadi .exe
