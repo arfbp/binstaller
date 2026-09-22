@@ -18,7 +18,7 @@ if %errorlevel% neq 0 (
 :: Runtime variables
 :: =======================================================
 set "MYDIR=%~dp0"
-set "ARIA2=%MYDIR%aria2c.exe"
+set "ARIA2=%TMP%\aria2\aria2c.exe"
 set "DL_DIR=%MYDIR%downloads"
 set "LOG_DIR=%DL_DIR%\logs"
 set "TEMP_DIR=%DL_DIR%\temp"
