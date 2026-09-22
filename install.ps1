@@ -3,7 +3,7 @@ $batUrl    = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main
 $batFile   = "$env:TEMP\installer.bat"
 
 
-$aria2ZipUrl  = 'https://github.com/arfbp/binstaller/raw/refs/heads/main/aria2c.exe'
+$aria2ZipUrl  = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/aria2c.exe'
 $aria2Folder  = "$env:TEMP\aria2"
 $aria2Exe     = "$aria2Folder\aria2c.exe"
 $aria2ZipPath = "$env:TEMP\aria2c.exe"
