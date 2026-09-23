@@ -3,8 +3,7 @@ $batUrl    = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main
 $batFile   = "$env:TEMP\installer.bat"
 
 $aria2Url    = 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/aria2c.exe'
-$aria2Folder = "$env:TEMP\aria2"
-$aria2Exe    = "$aria2Folder\aria2c.exe"
+$aria2Exe  = "$env:TEMP\aria2.exe"
 
 # Fungsi warna output
 function Write-Info($msg)    { Write-Host "[INFO]  $msg" -ForegroundColor Cyan }
