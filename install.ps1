@@ -11,9 +11,9 @@ function Write-Success($msg) { Write-Host "[ OK ]  $msg" -ForegroundColor Green 
 function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
 
 # Create aria2 folder if not exists
-if (-not (Test-Path $aria2Folder)) {
-    New-Item -ItemType Directory -Path $aria2Folder -Force | Out-Null
-}
+#if (-not (Test-Path $aria2Folder)) {
+#    New-Item -ItemType Directory -Path $aria2Folder -Force | Out-Null
+#}
 
 # Check existing aria2c.exe
 $needDownload = $true
@@ -26,15 +26,15 @@ if (Test-Path $aria2Exe) {
         $needDownload = $false
     }
     else {
-        Write-Info "aria2c.exe is invalid. Size: $([math]::Round($fileSize / 1MB, 2)) MB (< 5 MB)"
-        Write-Info "Force downloading new aria2c.exe..."
+        Write-Info "aria2.exe is invalid. Size: $([math]::Round($fileSize / 1MB, 2)) MB (< 5 MB)"
+        Write-Info "Force downloading new aria2.exe..."
         Remove-Item $aria2Exe -Force -ErrorAction SilentlyContinue
     }
 }
 
 # Download aria2c.exe (langsung ke lokasi final, tanpa lewat zip)
 if ($needDownload) {
-    Write-Info "Downloading aria2c.exe..."
+    Write-Info "Downloading aria2.exe..."
 
     try {
         Invoke-WebRequest -Uri $aria2Url -OutFile $aria2Exe -UseBasicParsing -ErrorAction Stop
