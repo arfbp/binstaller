@@ -14,7 +14,7 @@ function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
 #if (-not (Test-Path $aria2Folder)) {
 #    New-Item -ItemType Directory -Path $aria2Folder -Force | Out-Null
 #}
-
+<#
 # Check existing aria2c.exe
 $needDownload = $true
 
@@ -61,6 +61,7 @@ if (-not (Test-Path $aria2Exe)) {
     throw "aria2c.exe not found: $aria2Exe"
 }
 
+#>
 # Unduh installer.bat (selalu update)
 Write-Info "Mengunduh installer.bat..."
 try {
@@ -73,5 +74,5 @@ try {
 
 # Jalankan installer.bat dengan PATH yang sudah include aria2
 Write-Info "Menjalankan installer..."
-$env:PATH = "$aria2Folder;$env:PATH"
+$env:PATH = "$aria2exe;$env:PATH"
 cmd /c $batFile
