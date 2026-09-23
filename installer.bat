@@ -121,7 +121,7 @@ goto MainMenu
 :EnsureAria2
     if not exist "%ARIA2%" (
         echo [INFO] aria2c.exe not found. Downloading...
-        powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
+        powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
     )
     if exist "%ARIA2%" (
         "%ARIA2%" --version >nul 2>&1
