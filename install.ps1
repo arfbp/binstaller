@@ -12,7 +12,7 @@ function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
 
 
 Invoke-WebRequest -Uri $aria2Url -OutFile $aria2Exe -UseBasicParsing -ErrorAction Stop
-sleep 3
+Start-Sleep -Seconds 3
 
 # Create aria2 folder if not exists
 #if (-not (Test-Path $aria2Folder)) {
