@@ -11,11 +11,9 @@ function Write-Success($msg) { Write-Host "[ OK ]  $msg" -ForegroundColor Green 
 function Write-ErrorMsg($msg){ Write-Host "[FAIL]  $msg" -ForegroundColor Red }
 
 
-    try {
-        Invoke-WebRequest -Uri $aria2Url -OutFile $aria2Exe -UseBasicParsing -ErrorAction Stop
-    } catch {
-        throw "Failed to download aria2c.exe: $_"
-    }
+Invoke-WebRequest -Uri $aria2Url -OutFile $aria2Exe -UseBasicParsing -ErrorAction Stop
+sleep 3
+
 # Create aria2 folder if not exists
 #if (-not (Test-Path $aria2Folder)) {
 #    New-Item -ItemType Directory -Path $aria2Folder -Force | Out-Null
