@@ -118,23 +118,7 @@ goto MainMenu
     set "APP_9_DIR=%TIGHTVNC_DIR%"
     exit /b 0
 
-:EnsureAria2
-    if not exist "%ARIA2%" (
-        echo [INFO] aria2c.exe not found. Downloading...
-        powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/arfbp/binstaller/refs/heads/main/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
-    )
-    if exist "%ARIA2%" (
-        "%ARIA2%" --version >nul 2>&1
-        if errorlevel 1 (
-            echo [WARN] aria2c.exe is invalid. Redownloading...
-            del "%ARIA2%" >nul 2>&1
-            powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
-        )
-    )
-    if not exist "%ARIA2%" (
-        echo [WARN] aria2c.exe unavailable. Downloads will fall back to PowerShell.
-    )
-    exit /b 0
+
 
 :MainMenu
     cls
