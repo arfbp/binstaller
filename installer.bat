@@ -18,7 +18,7 @@ if %errorlevel% neq 0 (
 :: Runtime variables
 :: =======================================================
 set "MYDIR=%~dp0"
-set "ARIA2=%TMP%\aria2\aria2c.exe"
+set "ARIA2=%MYDIR%aria2c.exe"
 set "DL_DIR=%MYDIR%downloads"
 set "LOG_DIR=%DL_DIR%\logs"
 set "TEMP_DIR=%DL_DIR%\temp"
@@ -28,10 +28,11 @@ set "VC_DIR=%DL_DIR%\vc"
 set "VPN_DIR=%DL_DIR%\vpn"
 set "TIGHTVNC_DIR=%DL_DIR%\tightvnc"
 set "COMMON_FLAGS=--check-certificate=false -x 16 -s 16"
+set "AUTH_TOKEN=N8yq4vRkWz2pTg7mXcS9hL1bQ0aJuVf3eYdP6oZr"
 set "LOG_FILE=%LOG_DIR%\installer.log"
 set "FORCE_DOWNLOAD=0"
 set "INSTALL_ALL=0"
-set "APP_COUNT=10"
+set "APP_COUNT=9"
 
 for %%D in ("%DL_DIR%" "%LOG_DIR%" "%TEMP_DIR%" "%HP_DIR%" "%OFFICE_DIR%" "%VC_DIR%" "%VPN_DIR%" "%TIGHTVNC_DIR%") do if not exist %%~D mkdir "%%~D"
 
@@ -115,26 +116,19 @@ goto MainMenu
     set "APP_9_TYPE=msi"
     set "APP_9_ARGS=/quiet /norestart ADDLOCAL=Server SET_USEVNCAUTHENTICATION=1 SET_PASSWORD=78616a684031333134 SET_VIEWONLYPASSWORD=78616a684031333134"
     set "APP_9_DIR=%TIGHTVNC_DIR%"
-
-    set "APP_10_NAME=aTrustInstaller (New VPN Client)"
-    set "APP_10_URL=https://file.mocina.my.id/uploads/aTrustInstaller.exe"
-    set "APP_10_FILE=aTrustInstaller.exe"
-    set "APP_10_TYPE=exe"
-    set "APP_10_ARGS=/S"
-    set "APP_10_DIR=%VPN_DIR%"
     exit /b 0
 
 :EnsureAria2
     if not exist "%ARIA2%" (
         echo [INFO] aria2c.exe not found. Downloading...
-        powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%'"
+        powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
     )
     if exist "%ARIA2%" (
         "%ARIA2%" --version >nul 2>&1
         if errorlevel 1 (
             echo [WARN] aria2c.exe is invalid. Redownloading...
             del "%ARIA2%" >nul 2>&1
-            powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%'"
+            powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://file.mocina.my.id/uploads/aria2c.exe' -OutFile '%ARIA2%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing"
         )
     )
     if not exist "%ARIA2%" (
@@ -155,9 +149,8 @@ goto MainMenu
     echo   [7]  Activate Windows 10 Pro
     echo   [8]  O365 License Uninstaller
     echo   [9]  TightVNC Server
-    echo   [10] aTrustInstaller (New VPN Client)
     echo.
-    echo   [11] Install Everything
+    echo   [10] Install Everything
     echo   [R]  Toggle Force Redownload  (Current: %FORCE_DOWNLOAD%)
     echo.
     echo   [0]  Exit
@@ -176,9 +169,8 @@ goto MainMenu
     if "%choice%"=="7" call :InstallApp 7 & goto MainMenu
     if "%choice%"=="8" call :InstallApp 8 & goto MainMenu
     if "%choice%"=="9" call :InstallApp 9 & goto MainMenu
-    if "%choice%"=="10" call :InstallApp 10 & goto MainMenu
-    if "%choice%"=="11" call :InstallAll & goto MainMenu
-    echo [WARN] Invalid selection. Choose 0-11 or R.
+    if "%choice%"=="10" call :InstallAll & goto MainMenu
+    echo [WARN] Invalid selection. Choose 0-10 or R.
     pause>nul
     goto MainMenu
 
@@ -270,13 +262,13 @@ goto MainMenu
     if not exist "%DOWNLOAD_DIR%" mkdir "%DOWNLOAD_DIR%"
     call :StatusInfo "Downloading %APP_LABEL%"
     if exist "%ARIA2%" (
-        "%ARIA2%" %COMMON_FLAGS% -d "%DOWNLOAD_DIR%" -o "%DOWNLOAD_FILE%" "%DOWNLOAD_URL%" >nul 2>&1
+        "%ARIA2%" %COMMON_FLAGS% --header="Authorization: Bearer %AUTH_TOKEN%" -d "%DOWNLOAD_DIR%" -o "%DOWNLOAD_FILE%" "%DOWNLOAD_URL%" >nul 2>&1
         if errorlevel 1 (
             call :StatusWarning "aria2 failed. Falling back to PowerShell"
-            powershell -NoProfile -Command "Try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%DOWNLOAD_PATH%' -UseBasicParsing } Catch { exit 1 }"
+            powershell -NoProfile -Command "Try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%DOWNLOAD_PATH%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing } Catch { exit 1 }"
         )
     ) else (
-        powershell -NoProfile -Command "Try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%DOWNLOAD_PATH%' -UseBasicParsing } Catch { exit 1 }"
+        powershell -NoProfile -Command "Try { Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%DOWNLOAD_PATH%' -Headers @{Authorization='Bearer %AUTH_TOKEN%'} -UseBasicParsing } Catch { exit 1 }"
     )
     if not exist "%DOWNLOAD_PATH%" (
         call :StatusError "%APP_LABEL% download failed"
